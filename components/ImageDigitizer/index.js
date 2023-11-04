@@ -4,37 +4,42 @@ import { useState } from "react";
 import { createWorker } from "tesseract.js";
 import { pdfToImg } from "@/lib/pdf-to-img";
 import Loading from "../Loading";
+import SystemMessage from "../SytemMessage";
 
 const extractTextFromImageUrl = async (imageUrl) => {
-  let extractedText = "";
+  let extractedText = {};
   try {
     const worker = await createWorker("eng");
     const ret = await worker.recognize(imageUrl);
-    extractedText = ret.data.text;
+    extractedText.text = ret.data.text;
+    extractedText.success = true;
     await worker.terminate();
   } catch (error) {
-    extractedText =
+    extractedText.success = false;
+    extractedText.text =
       "Sorry. We encountered an error. Image URL is not publicly available. Please try another image URL, or please download the image and upload it.";
   }
   return extractedText;
 };
 
 const extractTextFromImageUpload = async (imageUpload) => {
-  let extractedText = "";
+  let extractedText = {};
   try {
     const worker = await createWorker("eng");
     const ret = await worker.recognize(imageUpload);
-    extractedText = ret.data.text;
+    extractedText.text = ret.data.text;
+    extractedText.success = true;
     await worker.terminate();
   } catch (error) {
-    extractedText =
-      "Sorry. We encountered an error. Please try another image URL, or please download the image and upload it.";
+    extractedText.success = false;
+    extractedText.text =
+      "Sorry. We encountered an error. This might be a server issue. Please try again later.";
   }
   return extractedText;
 };
 
 const extractTextFromPdfUpload = async (pdfUpload) => {
-  let extractedText = "";
+  let extractedText = {};
   try {
     const images = await pdfToImg(pdfUpload);
     const pages = [];
@@ -55,10 +60,12 @@ const extractTextFromPdfUpload = async (pdfUpload) => {
       await worker.terminate();
     }
 
-    extractedText = pages.join("\n\n");
+    extractedText.success = true;
+    extractedText.text = pages.join("\n\n");
   } catch (error) {
-    extractedText =
-      "Sorry. We encountered an error. Please try another image URL, or please download the image and upload it.";
+    extractedText.success = false;
+    extractedText.text =
+      "Sorry. We encountered an error. This might be a server issue. Please try again later.";
   }
   return extractedText;
 };
@@ -209,14 +216,17 @@ const ImageDigitizer = () => {
         {isLoading && digitizedData === null && (
           <Loading message="Digitizing..." />
         )}
-        {digitizedData !== null && (
+        {digitizedData !== null && digitizedData?.success && (
           <div className="digitized-data">
             <h2 style={{ fontWeight: "800" }}>Digitized Data</h2>
             <br />
             {digitizedData !== null && (
-              <p className="digitized-text">{digitizedData}</p>
+              <p className="digitized-text">{digitizedData?.text}</p>
             )}
           </div>
+        )}
+        {digitizedData !== null && !digitizedData?.success && (
+          <SystemMessage type="error" message={digitizedData?.text} />
         )}
       </div>
     </div>
