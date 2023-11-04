@@ -142,7 +142,7 @@ const ImageDigitizer = () => {
             }}
             className="radio-input data-source-utility-input"
           />
-          <label htmlFor="imageUrl">ImageURL</label>
+          <label htmlFor="imageUrl">Image URL</label>
 
           <input
             type="radio"
