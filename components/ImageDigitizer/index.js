@@ -70,7 +70,8 @@ const extractTextFromPdfUpload = async (pdfUpload) => {
   return extractedText;
 };
 
-const ImageDigitizer = () => {
+const ImageDigitizer = ({ setPromptData }) => {
+  const [isOpen, setIsOpen] = useState(true);
   const [digitizedData, setDigitizedData] = useState(null);
   const [imageURL, setImageURL] = useState("");
   const [uploadedImage, setUploadedImage] = useState("");
@@ -93,9 +94,10 @@ const ImageDigitizer = () => {
         return alert("Please enter an image URL.");
       } else {
         setIsLoading(true);
-        extractTextFromImageUrl(imageURL).then((text) => {
+        extractTextFromImageUrl(imageURL).then((result) => {
           setIsLoading(false);
-          setDigitizedData(text);
+          setDigitizedData(result);
+          setPromptData(result);
         });
       }
     } else if (uploadType === "Image Upload") {
@@ -103,9 +105,10 @@ const ImageDigitizer = () => {
         return alert("Please upload an image.");
       } else {
         setIsLoading(true);
-        extractTextFromImageUpload(uploadedImage).then((text) => {
+        extractTextFromImageUpload(uploadedImage).then((result) => {
           setIsLoading(false);
-          setDigitizedData(text);
+          setDigitizedData(result);
+          setPromptData(result);
         });
       }
     } else if (uploadType === "PDF Upload") {
@@ -113,9 +116,10 @@ const ImageDigitizer = () => {
         return alert("Please upload a PDF.");
       } else {
         setIsLoading(true);
-        extractTextFromPdfUpload(uploadedPDF).then((text) => {
+        extractTextFromPdfUpload(uploadedPDF).then((result) => {
           setIsLoading(false);
-          setDigitizedData(text);
+          setDigitizedData(result);
+          setPromptData(result);
         });
       }
     }
@@ -212,21 +216,28 @@ const ImageDigitizer = () => {
           Reset
         </button>
       </div>
-      <div className="digitized-output">
-        {isLoading && digitizedData === null && (
-          <Loading message="Digitizing..." />
-        )}
-        {digitizedData !== null && digitizedData?.success && (
-          <div className="digitized-data">
-            <h2 style={{ fontWeight: "800" }}>Digitized Data</h2>
-            <br />
-            {digitizedData !== null && (
-              <p className="digitized-text">{digitizedData?.text}</p>
+      <div className="accordion">
+        <button onClick={() => setIsOpen(!isOpen)} style={{ fontWeight: "800" }}>
+          {digitizedData === null ? ("") : (isOpen ? "Hide Digitized Data" : "Show Digitized Data")}
+        </button>
+
+        {isOpen && (
+          <div className="digitized-output">
+            {isLoading && digitizedData === null && (
+              <Loading message="Digitizing..." />
+            )}
+            {digitizedData !== null && digitizedData?.success && (
+              <div className="digitized-data">
+                <br />
+                {digitizedData !== null && (
+                  <p className="digitized-text">{digitizedData?.text}</p>
+                )}
+              </div>
+            )}
+            {digitizedData !== null && !digitizedData?.success && (
+              <SystemMessage type="error" message={digitizedData?.text} />
             )}
           </div>
-        )}
-        {digitizedData !== null && !digitizedData?.success && (
-          <SystemMessage type="error" message={digitizedData?.text} />
         )}
       </div>
     </div>
