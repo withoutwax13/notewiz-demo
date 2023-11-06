@@ -77,6 +77,7 @@ const ImageDigitizer = ({ setPromptData }) => {
   const [uploadedImage, setUploadedImage] = useState("");
   const [uploadedPDF, setUploadedPDF] = useState("");
   const [uploadType, setUploadType] = useState("Image URL");
+  const [customInput, setCustomInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleImageUpload = (e) => {
@@ -86,6 +87,10 @@ const ImageDigitizer = ({ setPromptData }) => {
   const handlePdfUpload = (e) => {
     const file = e.target.files[0];
     setUploadedPDF(file);
+  };
+
+  const handleCustomInput = (e) => {
+    setCustomInput(e.target.value);
   };
 
   const handleDigitize = () => {
@@ -122,6 +127,18 @@ const ImageDigitizer = ({ setPromptData }) => {
           setPromptData(result);
         });
       }
+    } else if (uploadType === "Custom Input") {
+      if (customInput === "") {
+        return alert("Please enter some text.");
+      } else {
+        setIsLoading(true);
+        const result = {};
+        result.text = customInput;
+        result.success = true;
+        setIsLoading(false);
+        setDigitizedData(result);
+        setPromptData(result);
+      }
     }
   };
   const handleReset = () => {
@@ -129,6 +146,7 @@ const ImageDigitizer = ({ setPromptData }) => {
     setImageURL("");
     setUploadedImage("");
     setUploadedPDF("");
+    setCustomInput("");
   };
   return (
     <div className="image-digitizer">
@@ -175,6 +193,20 @@ const ImageDigitizer = ({ setPromptData }) => {
             className="radio-input data-source-utility-input"
           />
           <label htmlFor="pdfUpload">PDF Upload</label>
+
+          <input
+            type="radio"
+            id="customInput"
+            name="uploadType"
+            value="Custom Input"
+            checked={uploadType === "Custom Input"}
+            onChange={(e) => {
+              handleReset();
+              setUploadType(e.target.value);
+            }}
+            className="radio-input data-source-utility-input"
+          />
+          <label htmlFor="customInput">Custom Input</label>
         </div>
 
         {uploadType === "Image URL" && (
@@ -205,6 +237,15 @@ const ImageDigitizer = ({ setPromptData }) => {
           />
         )}
 
+        {uploadType === "Custom Input" && (
+          <textarea
+            style={{ color: "black", padding: "10px", marginBottom: "10px" }}
+            rows={10}
+            value={customInput}
+            onChange={(e) => handleCustomInput(e)}
+          />
+        )}
+
         <button
           className="primary-btn"
           onClick={handleDigitize}
@@ -217,8 +258,15 @@ const ImageDigitizer = ({ setPromptData }) => {
         </button>
       </div>
       <div className="accordion">
-        <button onClick={() => setIsOpen(!isOpen)} style={{ fontWeight: "800" }}>
-          {digitizedData === null ? ("") : (isOpen ? "Hide Digitized Data" : "Show Digitized Data")}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          style={{ fontWeight: "800" }}
+        >
+          {digitizedData === null
+            ? ""
+            : isOpen
+            ? "Hide Digitized Data"
+            : "Show Digitized Data"}
         </button>
 
         {isOpen && (

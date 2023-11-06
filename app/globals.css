@@ -49,6 +49,9 @@ body {
   justify-content: center;
   align-items: center;
   margin: auto;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 .digitized-image img {
@@ -233,10 +236,7 @@ body {
   justify-content: center;
   gap: 20px;
   padding: 20px;
-  margin-bottom: 20px;
-  margin-top: 20px;
-  margin-left: 5%;
-  margin-right: 5%;
+  margin: 20px auto;
 }
 
 .examnify-data-utilities {
