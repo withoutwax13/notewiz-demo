@@ -1,50 +1,61 @@
 import { useState } from "react";
-import { ChatGPTAPI } from "chatgpt";
+import { OpenAI } from "openai";
+import configuration from "@/lib/openaiConfig";
 import Loading from "../Loading";
 import SystemMessage from "../SytemMessage";
 
-const sendPromptToChatGPT = async ({ prompt, type }) => {
-  const api = new ChatGPTAPI({
-    apiKey: process.env.NEXT_PUBLIC_API_KEY,
-    debug: false,
-  });
-  let res;
-  try {
-    if (type === "Summarize") {
-      res = await api.sendMessage(
-        `Write a summary based on the text below, remember USE ONLY THE TEXT BELOW, it is IMPORTANT.\n${prompt}`,
-        // timeout after 2 minutes
-        {
-          timeoutMs: 2 * 60 * 1000,
-          systemMessage:
-            "Return your response in an object data, wherein the property name is the topic heading. You can have many objects within an object. I REPEAT RETURN THE OBJECT DATA, no unnecessary words needed from you, this is the most important.",
-        }
-      );
-      console.log(res);
-    } else if (type === "Mock Exam") {
-      res = await api.sendMessage(
-        `Derive 5 questions of multiple choice option with answers based on the text below, USE ONLY THE TEXT BELOW, it is IMPORTANT.
-        \n${prompt}`,
-        // timeout after 2 minutes
-        {
-          timeoutMs: 2 * 60 * 1000,
-          systemMessage:
-            "Your response should be JUST an ARRAY OF OBJECT DATA, this is important, wherein the object data item is composed of the 'question', the 'options' (in an array data of string), and the 'answer' (an integer that indicates the index of the answer in options array), THIS IS IMPORTANT.  I REPEAT RETURN THE ARRAY DATA, no unnecessary words are needed from you, this is the most important.",
-        }
-      );
-      console.log(res);
-    }
-    return {
-      data: res.text,
-      success: true,
-    };
-  } catch (error) {
-    return {
-      data: null,
-      success: false,
-      error: error,
-    };
+const sendPromptToOpenAI = async ({ prompt, type }) => {
+  const openai = new OpenAI(configuration);
+  let createObject = {},
+    result = {};
+  switch (type) {
+    case "Summarize":
+      createObject = {
+        messages: [
+          {
+            role: "system",
+            content:
+              "You will return JSON object, The property names are the topic headings. You can have many objects within an object.",
+          },
+          {
+            role: "user",
+            content: `Write a summary based on the text below, remember USE ONLY THE TEXT BELOW, it is IMPORTANT. \n${prompt}`,
+          },
+        ],
+        model: "gpt-3.5-turbo-1106",
+        response_format: { type: "json_object" },
+      };
+      break;
+    case "Mock Exam":
+      createObject = {
+        messages: [
+          {
+            role: "system",
+            content:
+              "You will return JSON object. The JSON object should contain an ARRAY OF OBJECT DATA, this is important.",
+          },
+          {
+            role: "user",
+            content: `Return 5 array item of object data. Each object data item is composed of the 'question', the 'options' (in an array data of string), and the 'answer' (an integer that indicates the index of the answer in options array), THIS IS IMPORTANT. \n${prompt}`,
+          },
+        ],
+        model: "gpt-3.5-turbo-1106",
+        response_format: { type: "json_object" },
+      };
+      break;
+    default:
+      break;
   }
+  const completion = await openai.chat.completions.create(createObject);
+  result = {
+    success: true,
+    id: completion.id,
+    data: JSON.parse(completion.choices[0].message.content),
+    usage: completion.usage.total_tokens,
+  };
+  console.log(`${typeof result.data}`);
+  console.log(result.data);
+  return result;
 };
 
 const ExamnifyData = ({ promptData }) => {
@@ -54,10 +65,10 @@ const ExamnifyData = ({ promptData }) => {
   const [isError, setIsError] = useState(false);
   const handleProduceOutput = () => {
     setIsLoading(true);
-    sendPromptToChatGPT({ prompt: promptData.text, type: produceType }).then(
+    sendPromptToOpenAI({ prompt: promptData.text, type: produceType }).then(
       (res) => {
         if (res.success) {
-          setAiResponse(JSON.parse(res.data));
+          setAiResponse(res.data);
         } else {
           setIsError(true);
         }
@@ -139,7 +150,11 @@ const ExamnifyData = ({ promptData }) => {
           </button>
         </div>
       </div>
-      {produceType === "Flashcards" && <div><p>Flashcards are not yet supported.</p></div>}
+      {produceType === "Flashcards" && (
+        <div>
+          <p>Flashcards are not yet supported.</p>
+        </div>
+      )}
       {aiResponse !== null && !isLoading && (
         <div className="output-container">
           <div className="output-title">
@@ -148,7 +163,7 @@ const ExamnifyData = ({ promptData }) => {
           <div className="output-text">
             {produceType === "Mock Exam" && (
               <div className="mock-exam-output">
-                {aiResponse.map((item, index) => (
+                {aiResponse["questions"].map((item, index) => (
                   <div className="mock-exam-item" key={index}>
                     <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
                     <ol className="mock-exam-options">
