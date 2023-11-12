@@ -173,43 +173,26 @@ const ExamnifyData = ({ promptData }) => {
           <div className="output-text">
             {produceType === "Mock Exam" && (
               <div className="mock-exam-output">
-                {aiResponse["questions"]
-                  ? aiResponse["questions"].map((item, index) => (
-                      <div className="mock-exam-item" key={index}>
-                        <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
-                        <ol className="mock-exam-options">
-                          {item.options.map((option, index) => (
-                            <li className="mock-exam-option" key={index}>
-                              <p>{option}</p>
-                            </li>
-                          ))}
-                        </ol>
-                        <p
-                          style={{ fontWeight: "600" }}
-                          className="mock-exam-answer"
-                        >
-                          Answer: {item.options[item.answer]}
-                        </p>
-                      </div>
-                    ))
-                  : aiResponse["data"].map((item, index) => (
-                      <div className="mock-exam-item" key={index}>
-                        <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
-                        <ol className="mock-exam-options">
-                          {item.options.map((option, index) => (
-                            <li className="mock-exam-option" key={index}>
-                              <p>{option}</p>
-                            </li>
-                          ))}
-                        </ol>
-                        <p
-                          style={{ fontWeight: "600" }}
-                          className="mock-exam-answer"
-                        >
-                          Answer: {item.options[item.answer]}
-                        </p>
-                      </div>
-                    ))}
+                {Object.keys(aiResponse).map((key, _) => {
+                  return aiResponse[key].map((item, index) => (
+                    <div className="mock-exam-item" key={index}>
+                      <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
+                      <ol className="mock-exam-options">
+                        {item.options.map((option, index) => (
+                          <li className="mock-exam-option" key={index}>
+                            <p>{option}</p>
+                          </li>
+                        ))}
+                      </ol>
+                      <p
+                        style={{ fontWeight: "600" }}
+                        className="mock-exam-answer"
+                      >
+                        Answer: {item.options[item.answer]}
+                      </p>
+                    </div>
+                  ));
+                })}
               </div>
             )}
             {produceType === "Summarize" && (
