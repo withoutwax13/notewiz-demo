@@ -36,7 +36,7 @@ const sendPromptToOpenAI = async ({ prompt, type }) => {
           },
           {
             role: "user",
-            content: `Return 5 array item of object data. Each object data item is composed of the 'question', the 'options' (in an array data of string), and the 'answer' (an integer that indicates the index of the answer in options array), THIS IS IMPORTANT. \n${prompt}`,
+            content: `Return minimum of 5 array item of object data. If the text is long enough, the maximum of array should be at 10. Each object data item is composed of the 'question', the 'options' (in an array data of string), and the 'answer' (an integer that indicates the index of the answer in options array), THIS IS IMPORTANT. \n${prompt}`,
           },
         ],
         model: "gpt-3.5-turbo-1106",
@@ -173,24 +173,43 @@ const ExamnifyData = ({ promptData }) => {
           <div className="output-text">
             {produceType === "Mock Exam" && (
               <div className="mock-exam-output">
-                {aiResponse["questions"].map((item, index) => (
-                  <div className="mock-exam-item" key={index}>
-                    <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
-                    <ol className="mock-exam-options">
-                      {item.options.map((option, index) => (
-                        <li className="mock-exam-option" key={index}>
-                          <p>{option}</p>
-                        </li>
-                      ))}
-                    </ol>
-                    <p
-                      style={{ fontWeight: "600" }}
-                      className="mock-exam-answer"
-                    >
-                      Answer: {item.options[item.answer]}
-                    </p>
-                  </div>
-                ))}
+                {aiResponse["questions"]
+                  ? aiResponse["questions"].map((item, index) => (
+                      <div className="mock-exam-item" key={index}>
+                        <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
+                        <ol className="mock-exam-options">
+                          {item.options.map((option, index) => (
+                            <li className="mock-exam-option" key={index}>
+                              <p>{option}</p>
+                            </li>
+                          ))}
+                        </ol>
+                        <p
+                          style={{ fontWeight: "600" }}
+                          className="mock-exam-answer"
+                        >
+                          Answer: {item.options[item.answer]}
+                        </p>
+                      </div>
+                    ))
+                  : aiResponse["data"].array.map((item, index) => (
+                      <div className="mock-exam-item" key={index}>
+                        <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
+                        <ol className="mock-exam-options">
+                          {item.options.map((option, index) => (
+                            <li className="mock-exam-option" key={index}>
+                              <p>{option}</p>
+                            </li>
+                          ))}
+                        </ol>
+                        <p
+                          style={{ fontWeight: "600" }}
+                          className="mock-exam-answer"
+                        >
+                          Answer: {item.options[item.answer]}
+                        </p>
+                      </div>
+                    ))}
               </div>
             )}
             {produceType === "Summarize" && (

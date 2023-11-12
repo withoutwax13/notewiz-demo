@@ -5,20 +5,20 @@ import { createWorker } from "tesseract.js";
 import { pdfToImg } from "@/lib/pdf-to-img";
 import Loading from "../Loading";
 import SystemMessage from "../SytemMessage";
+import imageToText from "@/lib/file-to-text";
 
 const extractTextFromImageUpload = async (imageUpload) => {
   let extractedText = {};
   try {
-    const worker = await createWorker("eng");
-    const ret = await worker.recognize(imageUpload);
-    extractedText.text = ret.data.text;
+    const result = await imageToText(imageUpload);
+    extractedText.text = result;
     extractedText.success = true;
-    await worker.terminate();
   } catch (error) {
     extractedText.success = false;
     extractedText.text =
       "Sorry. We encountered an error. This might be a server issue. Please try again later.";
   }
+  console.log(extractedText)
   return extractedText;
 };
 
@@ -26,27 +26,15 @@ const extractTextFromPdfUpload = async (pdfUpload) => {
   let extractedText = {};
   try {
     const images = await pdfToImg(pdfUpload);
-    const pages = [];
-    for (let i = 0; i < images.length; i++) {
-      const image = images[i];
-      const worker = await createWorker("eng");
-
-      await worker.load();
-      await worker.loadLanguage("eng");
-      await worker.initialize("eng");
-      const {
-        data: { text },
-      } = await worker.recognize(image);
-
-      // Pushing the extracted text from each page to the pages array
-      pages.push(text);
-
-      await worker.terminate();
-    }
+    console.log(images); // log images
+    const textPromises = images.map(image => imageToText(image, true));
+    const pages = await Promise.all(textPromises);
+    console.log(pages); // log pages
 
     extractedText.success = true;
-    extractedText.text = pages.join("\n\n");
+    extractedText.text = pages.join("\n");
   } catch (error) {
+    console.log(error); // log error
     extractedText.success = false;
     extractedText.text =
       "Sorry. We encountered an error. This might be a server issue. Please try again later.";
