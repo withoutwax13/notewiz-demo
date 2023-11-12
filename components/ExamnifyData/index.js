@@ -192,7 +192,7 @@ const ExamnifyData = ({ promptData }) => {
                         </p>
                       </div>
                     ))
-                  : aiResponse["data"].array.map((item, index) => (
+                  : aiResponse["data"].map((item, index) => (
                       <div className="mock-exam-item" key={index}>
                         <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
                         <ol className="mock-exam-options">
