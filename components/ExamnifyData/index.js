@@ -79,11 +79,17 @@ const ExamnifyData = ({ promptData }) => {
   const renderNestedObject = (obj) => {
     return Object.keys(obj).map((key, index) => (
       <div key={index}>
-        <h4 style={{ fontWeight: "800" }}>{key}</h4>
+        <h4
+          style={{ fontWeight: "800", marginTop: "5px", marginBottom: "5px" }}
+        >
+          {key}
+        </h4>
         {typeof obj[key] === "object" && obj[key] !== null ? (
           renderNestedObject(obj[key])
         ) : (
-          <p>{JSON.stringify(obj[key])}</p>
+          <p style={{ marginTop: "5px", marginBottom: "5px" }}>
+            {JSON.stringify(obj[key]).split('"').join("")}
+          </p>
         )}
       </div>
     ));
@@ -94,51 +100,55 @@ const ExamnifyData = ({ promptData }) => {
         <h1 style={{ fontWeight: "800" }}>Examnify Digitized Data</h1>
       </div>
       <div className="examnify-data-utilities">
-        <div className="examnify-options">
-          <input
-            type="radio"
-            id="mockExam"
-            name="produceType"
-            value="Mock Exam"
-            checked={produceType === "Mock Exam"}
-            onChange={(e) => {
-              setProduceType(e.target.value);
-              setAiResponse(null);
-              setIsError(false);
-            }}
-            className="radio-input data-source-utility-input"
-          />
-          <label htmlFor="mockExam">Mock Exam</label>
-
-          <input
-            type="radio"
-            id="flashcards"
-            name="produceType"
-            value="Flashcards"
-            checked={produceType === "Flashcards"}
-            onChange={(e) => {
-              setProduceType(e.target.value);
-              setAiResponse(null);
-              setIsError(false);
-            }}
-            className="radio-input data-source-utility-input"
-          />
-          <label htmlFor="flashcards">Flashcards</label>
-
-          <input
-            type="radio"
-            id="summarize"
-            name="produceType"
-            value="Summarize"
-            checked={produceType === "Summarize"}
-            onChange={(e) => {
-              setProduceType(e.target.value);
-              setAiResponse(null);
-              setIsError(false);
-            }}
-            className="radio-input data-source-utility-input"
-          />
-          <label htmlFor="summarize">Summarize</label>
+        <div className="option-group">
+          <div className="examnify-options">
+            <input
+              type="radio"
+              id="mockExam"
+              name="produceType"
+              value="Mock Exam"
+              checked={produceType === "Mock Exam"}
+              onChange={(e) => {
+                setProduceType(e.target.value);
+                setAiResponse(null);
+                setIsError(false);
+              }}
+              className="radio-input data-source-utility-input"
+            />
+            <label htmlFor="mockExam">Mock Exam</label>
+          </div>
+          <div className="option-group">
+            <input
+              type="radio"
+              id="flashcards"
+              name="produceType"
+              value="Flashcards"
+              checked={produceType === "Flashcards"}
+              onChange={(e) => {
+                setProduceType(e.target.value);
+                setAiResponse(null);
+                setIsError(false);
+              }}
+              className="radio-input data-source-utility-input"
+            />
+            <label htmlFor="flashcards">Flashcards</label>
+          </div>
+          <div className="option-group">
+            <input
+              type="radio"
+              id="summarize"
+              name="produceType"
+              value="Summarize"
+              checked={produceType === "Summarize"}
+              onChange={(e) => {
+                setProduceType(e.target.value);
+                setAiResponse(null);
+                setIsError(false);
+              }}
+              className="radio-input data-source-utility-input"
+            />
+            <label htmlFor="summarize">Summarize</label>
+          </div>
         </div>
         <div className="examnify-actions">
           <button
@@ -173,7 +183,10 @@ const ExamnifyData = ({ promptData }) => {
                         </li>
                       ))}
                     </ol>
-                    <p style={{ fontWeight: "600" }}>
+                    <p
+                      style={{ fontWeight: "600" }}
+                      className="mock-exam-answer"
+                    >
                       Answer: {item.options[item.answer]}
                     </p>
                   </div>

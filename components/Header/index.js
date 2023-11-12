@@ -1,21 +1,37 @@
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
+
 const Header = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <header className="header">
-      <div className="container">
-        <div className="header-content">
-          <h1 className="app-logo">NoteWiz Demo</h1>
-          <div className="header-right">
-            <a
-              href="https://www.github.com/withoutwax13"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="secondary-btn"
-            >
-              Visit Developer's Github
-            </a>
-            <button className="primary-btn">Subscribe For Full App Early Access</button>
-          </div>
-        </div>
+      <div className="header-content">
+        <h1 className="app-logo">
+          <Link href="/">
+            NoteWiz
+          </Link>
+        </h1>
+        <button onClick={() => setIsOpen(true)} className="menu-button">
+          Menu
+        </button>
+        <nav className={isOpen ? "menu show" : "menu"}>
+          <button onClick={() => setIsOpen(false)} className="close-button">
+            X
+          </button>
+          <a
+            href="https://github.com/withoutwax13/notewiz-demo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="menu-item"
+          >
+            Visit Repository
+          </a>
+          <button className="menu-item">
+            Subscribe For Early Full App Access and Updates
+          </button>
+        </nav>
       </div>
     </header>
   );

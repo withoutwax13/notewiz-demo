@@ -6,22 +6,6 @@ import { pdfToImg } from "@/lib/pdf-to-img";
 import Loading from "../Loading";
 import SystemMessage from "../SytemMessage";
 
-const extractTextFromImageUrl = async (imageUrl) => {
-  let extractedText = {};
-  try {
-    const worker = await createWorker("eng");
-    const ret = await worker.recognize(imageUrl);
-    extractedText.text = ret.data.text;
-    extractedText.success = true;
-    await worker.terminate();
-  } catch (error) {
-    extractedText.success = false;
-    extractedText.text =
-      "Sorry. We encountered an error. Image URL is not publicly available. Please try another image URL, or please download the image and upload it.";
-  }
-  return extractedText;
-};
-
 const extractTextFromImageUpload = async (imageUpload) => {
   let extractedText = {};
   try {
@@ -71,12 +55,11 @@ const extractTextFromPdfUpload = async (pdfUpload) => {
 };
 
 const ImageDigitizer = ({ setPromptData }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [digitizedData, setDigitizedData] = useState(null);
-  const [imageURL, setImageURL] = useState("");
   const [uploadedImage, setUploadedImage] = useState("");
   const [uploadedPDF, setUploadedPDF] = useState("");
-  const [uploadType, setUploadType] = useState("Image URL");
+  const [uploadType, setUploadType] = useState("Image Upload");
   const [customInput, setCustomInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -94,18 +77,7 @@ const ImageDigitizer = ({ setPromptData }) => {
   };
 
   const handleDigitize = () => {
-    if (uploadType === "Image URL") {
-      if (imageURL === "") {
-        return alert("Please enter an image URL.");
-      } else {
-        setIsLoading(true);
-        extractTextFromImageUrl(imageURL).then((result) => {
-          setIsLoading(false);
-          setDigitizedData(result);
-          setPromptData(result);
-        });
-      }
-    } else if (uploadType === "Image Upload") {
+    if (uploadType === "Image Upload") {
       if (uploadedImage === "") {
         return alert("Please upload an image.");
       } else {
@@ -143,84 +115,64 @@ const ImageDigitizer = ({ setPromptData }) => {
   };
   const handleReset = () => {
     setDigitizedData(null);
-    setImageURL("");
     setUploadedImage("");
     setUploadedPDF("");
     setCustomInput("");
   };
   return (
-    <div className="image-digitizer">
+    <div className="image-digitizer-container">
       <div className="utilities">
         <div className="data-source-utility">
-          <input
-            type="radio"
-            id="imageUrl"
-            name="uploadType"
-            value="Image URL"
-            checked={uploadType === "Image URL"}
-            onChange={(e) => {
-              handleReset();
-              setUploadType(e.target.value);
-            }}
-            className="radio-input data-source-utility-input"
-          />
-          <label htmlFor="imageUrl">Image URL</label>
-
-          <input
-            type="radio"
-            id="imageUpload"
-            name="uploadType"
-            value="Image Upload"
-            checked={uploadType === "Image Upload"}
-            onChange={(e) => {
-              handleReset();
-              setUploadType(e.target.value);
-            }}
-            className="radio-input data-source-utility-input"
-          />
-          <label htmlFor="imageUpload">Image Upload</label>
-
-          <input
-            type="radio"
-            id="pdfUpload"
-            name="uploadType"
-            value="PDF Upload"
-            checked={uploadType === "PDF Upload"}
-            onChange={(e) => {
-              handleReset();
-              setUploadType(e.target.value);
-            }}
-            className="radio-input data-source-utility-input"
-          />
-          <label htmlFor="pdfUpload">PDF Upload</label>
-
-          <input
-            type="radio"
-            id="customInput"
-            name="uploadType"
-            value="Custom Input"
-            checked={uploadType === "Custom Input"}
-            onChange={(e) => {
-              handleReset();
-              setUploadType(e.target.value);
-            }}
-            className="radio-input data-source-utility-input"
-          />
-          <label htmlFor="customInput">Custom Input</label>
+          <div className="option-group">
+            <input
+              type="radio"
+              id="imageUpload"
+              name="uploadType"
+              value="Image Upload"
+              checked={uploadType === "Image Upload"}
+              onChange={(e) => {
+                handleReset();
+                setUploadType(e.target.value);
+              }}
+              className="radio-input data-source-utility-input"
+            />
+            <label htmlFor="imageUpload">Image Upload</label>
+          </div>
+          <div className="option-group">
+            <input
+              type="radio"
+              id="pdfUpload"
+              name="uploadType"
+              value="PDF Upload"
+              checked={uploadType === "PDF Upload"}
+              onChange={(e) => {
+                handleReset();
+                setUploadType(e.target.value);
+              }}
+              className="radio-input data-source-utility-input"
+            />
+            <label htmlFor="pdfUpload">PDF Upload</label>
+          </div>
+          <div className="option-group">
+            <input
+              type="radio"
+              id="customInput"
+              name="uploadType"
+              value="Custom Input"
+              checked={uploadType === "Custom Input"}
+              onChange={(e) => {
+                handleReset();
+                setUploadType(e.target.value);
+              }}
+              className="radio-input data-source-utility-input"
+            />
+            <label htmlFor="customInput">Custom Input</label>
+          </div>
         </div>
-
-        {uploadType === "Image URL" && (
-          <input
-            type="text"
-            placeholder="Enter Image URL"
-            value={imageURL}
-            onChange={(e) => setImageURL(e.target.value)}
-            disabled={digitizedData !== null}
-          />
-        )}
 
         {uploadType === "Image Upload" && (
           <input
+            style={{ margin: "5px" }}
             type="file"
             accept="image/*"
             onChange={(e) => handleImageUpload(e)}
@@ -230,6 +182,7 @@ const ImageDigitizer = ({ setPromptData }) => {
 
         {uploadType === "PDF Upload" && (
           <input
+            style={{ margin: "5px" }}
             type="file"
             accept="application/pdf"
             onChange={(e) => handlePdfUpload(e)}
@@ -241,6 +194,7 @@ const ImageDigitizer = ({ setPromptData }) => {
           <textarea
             style={{ color: "black", padding: "10px", marginBottom: "10px" }}
             rows={10}
+            cols={35}
             value={customInput}
             onChange={(e) => handleCustomInput(e)}
           />
@@ -256,35 +210,17 @@ const ImageDigitizer = ({ setPromptData }) => {
         <button className="secondary-btn" onClick={handleReset}>
           Reset
         </button>
-      </div>
-      <div className="accordion">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          style={{ fontWeight: "800" }}
-        >
-          {digitizedData === null
-            ? ""
-            : isOpen
-            ? "Hide Digitized Data"
-            : "Show Digitized Data"}
-        </button>
-
-        {isOpen && (
-          <div className="digitized-output">
-            {isLoading && digitizedData === null && (
-              <Loading message="Digitizing..." />
-            )}
-            {digitizedData !== null && digitizedData?.success && (
-              <div className="digitized-data">
-                <br />
-                {digitizedData !== null && (
-                  <p className="digitized-text">{digitizedData?.text}</p>
-                )}
-              </div>
-            )}
-            {digitizedData !== null && !digitizedData?.success && (
-              <SystemMessage type="error" message={digitizedData?.text} />
-            )}
+        {isLoading && (
+          <div style={{ margin: "5px" }}>
+            <Loading message={`Processing your data...`} />
+          </div>
+        )}
+        {!isLoading && digitizedData !== null && (
+          <div style={{ margin: "5px" }}>
+            <SystemMessage
+              type={`success`}
+              message={`Data processed succesfully.`}
+            />
           </div>
         )}
       </div>
