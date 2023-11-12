@@ -250,3 +250,18 @@
   margin-bottom: 20px;
   margin-top: 20px;
 }
+
+.examnify-options {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.examnify-options {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}

@@ -28,9 +28,14 @@ const Header = () => {
           >
             Visit Repository
           </a>
-          <button className="menu-item">
-            Subscribe For Early Full App Access and Updates
-          </button>
+          <a
+            href="https://jpvalera.carrd.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="menu-item"
+          >
+            Contact Developer
+          </a>
         </nav>
       </div>
     </header>

@@ -100,8 +100,8 @@ const ExamnifyData = ({ promptData }) => {
         <h1 style={{ fontWeight: "800" }}>Examnify Digitized Data</h1>
       </div>
       <div className="examnify-data-utilities">
-        <div className="option-group">
-          <div className="examnify-options">
+        <div  className="examnify-options">
+          <div className="option-group">
             <input
               type="radio"
               id="mockExam"
