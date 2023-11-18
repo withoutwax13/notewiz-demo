@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { OpenAI } from "openai";
+import { Parser } from "json2csv";
 import configuration from "@/lib/openaiConfig";
 import Loading from "../Loading";
 import SystemMessage from "../SytemMessage";
@@ -58,6 +59,47 @@ const sendPromptToOpenAI = async ({ prompt, type }) => {
   return result;
 };
 
+const downloadCSV = (type, jsonObj) => {
+  // Flatten the data
+  const data = Object.values(jsonObj).reduce((acc, item) => {
+    // For each item, check each property
+    for (let key in item) {
+      // If the property is an array, create a new row for each element
+      if (Array.isArray(item[key])) {
+        item[key].forEach((element) => {
+          // Clone the item and replace the array with the current element
+          const newItem = { ...item, [key]: element };
+          acc.push(newItem);
+        });
+      } else {
+        acc.push(item);
+      }
+    }
+    return acc;
+  }, []);
+
+  function flattenObject(obj, prefix = '') {
+    return Object.keys(obj).reduce((acc, k) => {
+      const pre = prefix.length ? prefix + '.' : '';
+      if (typeof obj[k] === 'object' && obj[k] !== null) {
+        Object.assign(acc, flattenObject(obj[k], pre + k));
+      } else {
+        acc[pre + k] = obj[k];
+      }
+      return acc;
+    }, {});
+  }
+
+  const parser = new Parser();
+  const csv = parser.parse(type === "Mock Exam" ? data : Object.values(jsonObj).map(item => flattenObject(item)));
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `notewiz-${Date.now()}.csv`;
+  link.click();
+};
+
 const ExamnifyData = ({ promptData }) => {
   const [produceType, setProduceType] = useState("Mock Exam");
   const [aiResponse, setAiResponse] = useState(null);
@@ -100,7 +142,7 @@ const ExamnifyData = ({ promptData }) => {
         <h1 style={{ fontWeight: "800" }}>Examnify Digitized Data</h1>
       </div>
       <div className="examnify-data-utilities">
-        <div  className="examnify-options">
+        <div className="examnify-options">
           <div className="option-group">
             <input
               type="radio"
@@ -173,6 +215,12 @@ const ExamnifyData = ({ promptData }) => {
           <div className="output-text">
             {produceType === "Mock Exam" && (
               <div className="mock-exam-output">
+                <button
+                  className="primary-btn"
+                  onClick={() => downloadCSV("Mock Exam", aiResponse)}
+                >
+                  Download CSV
+                </button>
                 {Object.keys(aiResponse).map((key, _) => {
                   return aiResponse[key].map((item, index) => (
                     <div className="mock-exam-item" key={index}>
@@ -197,6 +245,12 @@ const ExamnifyData = ({ promptData }) => {
             )}
             {produceType === "Summarize" && (
               <div className="summarize-output">
+                <button
+                  className="primary-btn"
+                  onClick={() => downloadCSV("Summarize", aiResponse)}
+                >
+                  Download CSV
+                </button>
                 {renderNestedObject(aiResponse)}
               </div>
             )}

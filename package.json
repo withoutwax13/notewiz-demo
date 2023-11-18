@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "chatgpt": "^5.2.5",
+    "json2csv": "^6.0.0-alpha.2",
     "next": "14.0.1",
     "openai": "^4.0.0",
     "pdfjs-dist": "^3.11.174",
