@@ -24,17 +24,26 @@ const Header = () => {
             href="https://github.com/withoutwax13/notewiz-demo"
             target="_blank"
             rel="noopener noreferrer"
-            className="menu-item"
+            className="menu-item-secondary"
           >
-            Visit Repository
+            REPOSITORY
           </a>
           <a
             href="https://jpvalera.carrd.co/"
             target="_blank"
             rel="noopener noreferrer"
+            className="menu-item-secondary"
+          >
+            DEVELOPER
+          </a>
+          <a
+            // todo: add donate logic
+            // href="/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="menu-item"
           >
-            Contact Developer
+            DONATE
           </a>
         </nav>
       </div>
