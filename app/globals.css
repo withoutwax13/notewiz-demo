@@ -277,3 +277,58 @@
   border-radius: 5px;
   margin-bottom: 10px;
 }
+
+.home-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20vh;
+  height: 50vh;
+  padding-left: 5vw;
+  padding-right: 5vw;
+  background-color: var(--background-color); /* Use a CSS variable from globals.css */
+}
+
+.hero {
+  text-align: center;
+  animation: fadeIn 2s ease-in-out;
+}
+
+.hero-title {
+  font-size: 3em;
+  color: var(--title-color); /* Use a CSS variable from globals.css */
+}
+
+.hero-paragraph {
+  font-size: 1.5em;
+  margin-top: 5vh;
+  color: var(--paragraph-color); /* Use a CSS variable from globals.css */
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.hero-highlight {
+  text-decoration: underline;
+}
+
+.hero-button {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  margin-top: 5vh;
+}
+
+.hero-button:hover {
+  transform: scale(1.1);
+}

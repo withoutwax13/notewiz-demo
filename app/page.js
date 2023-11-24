@@ -1,15 +1,17 @@
-"use client";
-
-import { useState } from "react";
-import ExamnifyData from "@/components/ExamnifyData";
-import ImageDigitizer from "@/components/ImageDigitizer";
+import Link from "next/link";
 
 export default function Home() {
-  const [promptData, setPromptData] = useState({});
   return (
-    <main className="container">
-      <ImageDigitizer className="image-digitizer" style={{ flex: "0 0 40%" }} setPromptData={setPromptData}/>
-      <ExamnifyData className="examnify-data" style={{ flex: "0 0 60%" }} promptData={promptData}/>
+    <main className="home-container">
+      <div className="hero">
+        <h1 className="hero-title">Elevate Your Studies with NoteWiz</h1>
+        <p className="hero-paragraph">
+          Digitize handwritten or printed notes, upload PDFs effortlessly, and
+          let our AI create mock exams, flashcards, and concise summaries for
+          your academic success. <span className="hero-highlight">All for free.</span>
+        </p>
+        <Link href="/product" className="hero-button">Get Started</Link>
+      </div>
     </main>
   );
 }
