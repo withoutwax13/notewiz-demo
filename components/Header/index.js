@@ -26,7 +26,7 @@ const Header = () => {
             rel="noopener noreferrer"
             className="menu-item-secondary"
           >
-            REPOSITORY
+            Repository
           </a>
           <a
             href="https://jpvalera.carrd.co/"
@@ -34,16 +34,15 @@ const Header = () => {
             rel="noopener noreferrer"
             className="menu-item-secondary"
           >
-            DEVELOPER
+            Dev Profile
           </a>
           <a
-            // todo: add donate logic
-            // href="/"
+            href="https://patreon.com/user?u=29949240&utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=creatorshare_creator&utm_content=join_link"
             target="_blank"
             rel="noopener noreferrer"
             className="menu-item"
           >
-            DONATE
+            Donations
           </a>
         </nav>
       </div>
