@@ -116,74 +116,6 @@
   }
 }
 
-.container {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-}
-
-.image-digitizer {
-  min-width: 40%; /* Set a minimum width */
-  max-width: 40%; /* Set a maximum width */
-  overflow: auto;
-}
-
-.examnify-data {
-  width: 60%; /* Adjust the width of the other element to fill the remaining space */
-}
-
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
-
-  .image-digitizer, .examnify-data {
-    width: 100%;
-  }
-}
-
-.image-digitizer-container .utilities {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-}
-
-@media (max-width: 768px) {
-  .image-digitizer-container .utilities {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
-}
-.option-group {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.option-group {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-.option-group input {
-  margin: 5px;
-  padding: 5px 10px; /* add padding */
-  border: 1px solid #ccc; /* gray border */
-  border-radius: 5px; /* rounded corners */
-}
-
-.option-group label {
-  margin: 5px;
-  font-weight: bold; /* make text bold */
-  color: #333; /* dark gray color */
-}
-
 .primary-btn {
   background-color: #333; /* dark gray background */
   color: #fff; /* white text */
@@ -212,70 +144,6 @@
 
 .secondary-btn:hover {
   background-color: #f0f0f0; /* light gray on hover */
-}
-
-.examnify-data {
-  background-color: white;
-  color: black;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
-}
-
-.mock-exam-options {
-  list-style-type: none;
-  padding: 0;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.mock-exam-option {
-  background-color: #f0f0f0; /* light gray background */
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.summarize-output {
-  background-color: #f0f0f0; /* light gray background */
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.examnify-container {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.output-container {
-  margin-top: 20px;
-}
-
-.output-title {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-bottom: 20px;
-  margin-top: 20px;
-}
-
-.mock-exam-answer {
-  margin-bottom: 20px;
-  margin-top: 20px;
-}
-
-.examnify-options {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.examnify-options {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
 }
 
 .home-container {
@@ -331,4 +199,186 @@
 
 .hero-button:hover {
   transform: scale(1.1);
+}
+
+/* pages/product.css */
+.product-container {
+  animation: fadeIn 3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.option-group-container {
+  display: flex;
+  justify-content: center;
+}
+
+.option-group {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.option-group input {
+  margin-right: 5px; /* adjust as needed */
+}
+
+/* or */
+
+.option-group label {
+  margin-left: 5px; /* adjust as needed */
+}
+
+.input-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.styled-input,
+.styled-textarea {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  width: 100%;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.section-title {
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.examnify-data-container {
+  margin-top: 5vh;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid black;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-message {
+  margin-left: 10px;
+  font-size: 20px; /* adjust as needed */
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.result-container {
+  animation: fadeIn 3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.output-container {
+  padding: 20px;
+  background-color: #f9f9f9; /* adjust as needed */
+  border-radius: 5px; /* adjust as needed */
+  margin-top: 20px; /* adjust as needed */
+}
+
+.output-title {
+  margin-bottom: 40px; /* adjust as needed */
+}
+
+.output-text {
+  font-size: 16px; /* adjust as needed */
+}
+
+.mock-exam-output {
+  margin-top: 20px; /* adjust as needed */
+}
+
+.mock-exam-item {
+  margin-bottom: 20px; /* adjust as needed */
+}
+
+.mock-exam-options {
+  margin-left: 20px; /* adjust as needed */
+}
+
+.mock-exam-answer {
+  font-weight: bold; /* adjust as needed */
+}
+
+.outline-output {
+  margin-top: 20px; /* adjust as needed */
+}
+
+.nested-object-container {
+  padding: 10px;
+  background-color: #f9f9f9; /* adjust as needed */
+  border-radius: 5px; /* adjust as needed */
+  margin-bottom: 10px; /* adjust as needed */
+}
+
+.nested-object-title {
+  margin-bottom: 10px; /* adjust as needed */
+  font-weight: bold; /* adjust as needed */
+}
+
+.nested-object-value {
+  font-size: 14px; /* adjust as needed */
+}
+
+.flashcard-output {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.flashcard-item {
+  background-color: #f9f9f9; /* adjust as needed */
+  border-radius: 5px; /* adjust as needed */
+  padding: 20px; /* adjust as needed */
+  margin: 10px; /* adjust as needed */
+  width: 200px; /* adjust as needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* adjust as needed */
+}
+
+.flashcard-item h4 {
+  margin-bottom: 20px; /* adjust as needed */
+}
+
+.flashcard-item p {
+  font-size: 16px; /* adjust as needed */
 }

@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OpenAI } from "openai";
-import { Parser } from "json2csv";
 import configuration from "@/lib/openaiConfig";
-import Loading from "../Loading";
+import { useDispatch } from "react-redux";
 import SystemMessage from "../SytemMessage";
+import Loading from "../Loading";
 
 const sendPromptToOpenAI = async ({ prompt, type }) => {
   const openai = new OpenAI(configuration);
   let createObject = {},
     result = {};
   switch (type) {
-    case "Summarize":
+    case "Outline":
       createObject = {
         messages: [
           {
@@ -20,10 +20,10 @@ const sendPromptToOpenAI = async ({ prompt, type }) => {
           },
           {
             role: "user",
-            content: `Write a summary based on the text below, remember USE ONLY THE TEXT BELOW, it is IMPORTANT. \n${prompt}`,
+            content: `Write a summary outline based on the text below, remember USE ONLY THE TEXT BELOW, it is IMPORTANT. \n${prompt}`,
           },
         ],
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-4-1106-preview",
         response_format: { type: "json_object" },
       };
       break;
@@ -37,13 +37,46 @@ const sendPromptToOpenAI = async ({ prompt, type }) => {
           },
           {
             role: "user",
-            content: `Return minimum of 5 array item of object data. If the text is long enough, the maximum of array should be at 10. Each object data item is composed of the 'question', the 'options' (in an array data of string), and the 'answer' (an integer that indicates the index of the answer in options array), THIS IS IMPORTANT. \n${prompt}`,
+            content: `Return 5-10 array item of object data. Each object data item is composed of the 'question', the 'options' (in an array data of string), and the 'answer' (an integer that indicates the index of the answer in options array), THIS IS IMPORTANT. \n${prompt}`,
           },
         ],
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-4-1106-preview",
         response_format: { type: "json_object" },
       };
       break;
+    case "Flashcards":
+      createObject = {
+        messages: [
+          {
+            role: "system",
+            content:
+              "You will return JSON object. The JSON object should contain an ARRAY OF OBJECT DATA, this is important.",
+          },
+          {
+            role: "user",
+            content: `Return 5-10 array item of string. The strings are the ideas/facts found in the text which will help the user to understand the text I will give, THIS IS IMPORTANT. \n${prompt}`,
+          },
+        ],
+        model: "gpt-4-1106-preview",
+        response_format: { type: "json_object" },
+      };
+      break;
+    case "Summary":
+      createObject = {
+        messages: [
+          {
+            role: "system",
+            content:
+              "You will return JSON object. The JSON object should contain a string.",
+          },
+          {
+            role: "user",
+            content: `Write a short sumamry, maximum of 5 sentences, of the this text: \n${prompt}`,
+          },
+        ],
+        model: "gpt-4-1106-preview",
+        response_format: { type: "json_object" },
+      };
     default:
       break;
   }
@@ -53,64 +86,30 @@ const sendPromptToOpenAI = async ({ prompt, type }) => {
     id: completion.id,
     data: JSON.parse(completion.choices[0].message.content),
     usage: completion.usage.total_tokens,
+    outputType: type,
   };
-  console.log(`${typeof result.data}`);
-  console.log(result.data);
   return result;
 };
 
-const downloadCSV = (type, jsonObj) => {
-  // Flatten the data
-  const data = Object.values(jsonObj).reduce((acc, item) => {
-    // For each item, check each property
-    for (let key in item) {
-      // If the property is an array, create a new row for each element
-      if (Array.isArray(item[key])) {
-        item[key].forEach((element) => {
-          // Clone the item and replace the array with the current element
-          const newItem = { ...item, [key]: element };
-          acc.push(newItem);
-        });
-      } else {
-        acc.push(item);
-      }
-    }
-    return acc;
-  }, []);
-
-  function flattenObject(obj, prefix = '') {
-    return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + '.' : '';
-      if (typeof obj[k] === 'object' && obj[k] !== null) {
-        Object.assign(acc, flattenObject(obj[k], pre + k));
-      } else {
-        acc[pre + k] = obj[k];
-      }
-      return acc;
-    }, {});
-  }
-
-  const parser = new Parser();
-  const csv = parser.parse(type === "Mock Exam" ? data : Object.values(jsonObj).map(item => flattenObject(item)));
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `notewiz-${Date.now()}.csv`;
-  link.click();
-};
-
-const ExamnifyData = ({ promptData }) => {
+const ExamnifyData = ({
+  setGeneratedOutput,
+  handleDigitize,
+  digitizedData,
+  isLoading,
+  setIsLoading,
+  isError,
+  setIsError,
+}) => {
   const [produceType, setProduceType] = useState("Mock Exam");
-  const [aiResponse, setAiResponse] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const dispatch = useDispatch();
+
   const handleProduceOutput = () => {
     setIsLoading(true);
-    sendPromptToOpenAI({ prompt: promptData.text, type: produceType }).then(
+
+    sendPromptToOpenAI({ prompt: digitizedData.text, type: produceType }).then(
       (res) => {
         if (res.success) {
-          setAiResponse(res.data);
+          dispatch(setGeneratedOutput(res));
         } else {
           setIsError(true);
         }
@@ -118,149 +117,97 @@ const ExamnifyData = ({ promptData }) => {
       }
     );
   };
-  const renderNestedObject = (obj) => {
-    return Object.keys(obj).map((key, index) => (
-      <div key={index}>
-        <h4
-          style={{ fontWeight: "800", marginTop: "5px", marginBottom: "5px" }}
-        >
-          {key}
-        </h4>
-        {typeof obj[key] === "object" && obj[key] !== null ? (
-          renderNestedObject(obj[key])
-        ) : (
-          <p style={{ marginTop: "5px", marginBottom: "5px" }}>
-            {JSON.stringify(obj[key]).split('"').join("")}
-          </p>
-        )}
-      </div>
-    ));
-  };
+
+  useEffect(() => {
+    if (digitizedData.success) {
+      handleProduceOutput();
+    }
+  }, [digitizedData]);
+
   return (
-    <div className="examnify-container">
+    <div className="examnify-data-container">
       <div className="section-title">
-        <h1 style={{ fontWeight: "800" }}>Examnify Digitized Data</h1>
+        <h1>2. Select Output Type</h1>
       </div>
-      <div className="examnify-data-utilities">
-        <div className="examnify-options">
-          <div className="option-group">
-            <input
-              type="radio"
-              id="mockExam"
-              name="produceType"
-              value="Mock Exam"
-              checked={produceType === "Mock Exam"}
-              onChange={(e) => {
-                setProduceType(e.target.value);
-                setAiResponse(null);
-                setIsError(false);
-              }}
-              className="radio-input data-source-utility-input"
-            />
-            <label htmlFor="mockExam">Mock Exam</label>
-          </div>
-          <div className="option-group">
-            <input
-              type="radio"
-              id="flashcards"
-              name="produceType"
-              value="Flashcards"
-              checked={produceType === "Flashcards"}
-              onChange={(e) => {
-                setProduceType(e.target.value);
-                setAiResponse(null);
-                setIsError(false);
-              }}
-              className="radio-input data-source-utility-input"
-            />
-            <label htmlFor="flashcards">Flashcards</label>
-          </div>
-          <div className="option-group">
-            <input
-              type="radio"
-              id="summarize"
-              name="produceType"
-              value="Summarize"
-              checked={produceType === "Summarize"}
-              onChange={(e) => {
-                setProduceType(e.target.value);
-                setAiResponse(null);
-                setIsError(false);
-              }}
-              className="radio-input data-source-utility-input"
-            />
-            <label htmlFor="summarize">Summarize</label>
-          </div>
-        </div>
-        <div className="examnify-actions">
-          <button
-            className="primary-btn"
-            onClick={handleProduceOutput}
+      <div className="option-group-container">
+        <div className="option-group">
+          <input
+            type="radio"
+            id="mockExam"
+            name="produceType"
+            value="Mock Exam"
+            checked={produceType === "Mock Exam"}
             disabled={isLoading}
-          >
-            Produce Output
-          </button>
+            onChange={(e) => {
+              setProduceType(e.target.value);
+              setIsError(false);
+            }}
+            className="radio-input data-source-utility-input"
+          />
+          <label htmlFor="mockExam">Mock Exam</label>
+        </div>
+        <div className="option-group">
+          <input
+            type="radio"
+            id="flashcards"
+            name="produceType"
+            value="Flashcards"
+            checked={produceType === "Flashcards"}
+            disabled={isLoading}
+            onChange={(e) => {
+              setProduceType(e.target.value);
+              setIsError(false);
+            }}
+            className="radio-input data-source-utility-input"
+          />
+          <label htmlFor="flashcards">Flashcards</label>
+        </div>
+        <div className="option-group">
+          <input
+            type="radio"
+            id="outline"
+            name="produceType"
+            value="Outline"
+            checked={produceType === "Outline"}
+            disabled={isLoading}
+            onChange={(e) => {
+              setProduceType(e.target.value);
+              setIsError(false);
+            }}
+            className="radio-input data-source-utility-input"
+          />
+          <label htmlFor="outline">Outline</label>
+        </div>
+        <div className="option-group">
+          <input
+            type="radio"
+            id="summary"
+            name="produceType"
+            value="Summary"
+            checked={produceType === "Summary"}
+            disabled={isLoading}
+            onChange={(e) => {
+              setProduceType(e.target.value);
+              setIsError(false);
+            }}
+            className="radio-input data-source-utility-input"
+          />
+          <label htmlFor="summary">Summary</label>
         </div>
       </div>
-      {produceType === "Flashcards" && (
-        <div>
-          <p>Flashcards are not yet supported.</p>
-        </div>
-      )}
-      {aiResponse !== null && !isLoading && (
-        <div className="output-container">
-          <div className="output-title">
-            <h3>Output</h3>
-          </div>
-          <div className="output-text">
-            {produceType === "Mock Exam" && (
-              <div className="mock-exam-output">
-                <button
-                  className="primary-btn"
-                  onClick={() => downloadCSV("Mock Exam", aiResponse)}
-                >
-                  Download CSV
-                </button>
-                {Object.keys(aiResponse).map((key, _) => {
-                  return aiResponse[key].map((item, index) => (
-                    <div className="mock-exam-item" key={index}>
-                      <h4 style={{ fontWeight: "800" }}>{item.question}</h4>
-                      <ol className="mock-exam-options">
-                        {item.options.map((option, index) => (
-                          <li className="mock-exam-option" key={index}>
-                            <p>{option}</p>
-                          </li>
-                        ))}
-                      </ol>
-                      <p
-                        style={{ fontWeight: "600" }}
-                        className="mock-exam-answer"
-                      >
-                        Answer: {item.options[item.answer]}
-                      </p>
-                    </div>
-                  ));
-                })}
-              </div>
-            )}
-            {produceType === "Summarize" && (
-              <div className="summarize-output">
-                <button
-                  className="primary-btn"
-                  onClick={() => downloadCSV("Summarize", aiResponse)}
-                >
-                  Download CSV
-                </button>
-                {renderNestedObject(aiResponse)}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-      {aiResponse === null && isLoading && (
-        <Loading text="Generating Output..." style={{ color: "black" }} />
-      )}
-      {isError && SystemMessage({ message: "Error in generating output." })}
+      <div className="button-group">
+        <button
+          className="primary-btn"
+          onClick={() => {
+            handleDigitize();
+          }}
+          disabled={isLoading}
+        >
+          Generate {produceType}
+        </button>
+      </div>
+      {isError && <SystemMessage message="Something went wrong." />}
+      {isLoading && <Loading message="Please wait for a few moments . . ." />}
     </div>
   );
 };
