@@ -197,6 +197,16 @@
   color: var(--paragraph-color); /* Use a CSS variable from globals.css */
 }
 
+@media (max-width: 900px) {
+  .hero-title {
+    font-size: 5vw;
+  }
+
+  .hero-paragraph {
+    font-size: 3vw;
+  }
+}
+
 @keyframes fadeIn {
   0% { opacity: 0; }
   100% { opacity: 1; }
