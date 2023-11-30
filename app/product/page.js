@@ -55,7 +55,7 @@ const extractTextFromPdfUpload = async (pdfUpload) => {
 export default function Product() {
   const [uploadedImage, setUploadedImage] = useState("");
   const [uploadedPDF, setUploadedPDF] = useState("");
-  const [uploadType, setUploadType] = useState("Image Upload");
+  const [uploadType, setUploadType] = useState("Custom Input");
   const [customInput, setCustomInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);

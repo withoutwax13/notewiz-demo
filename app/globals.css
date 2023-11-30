@@ -417,3 +417,13 @@ button:disabled {
 .flashcard-item p {
   font-size: 16px; /* adjust as needed */
 }
+
+.warning-text {
+  max-width: 50%; /* adjust as needed */
+  word-wrap: break-word;
+  text-align: center;
+  margin: 0 auto;
+  font-size: 13px;
+  margin-top: 15px;
+  color: #555;
+}
